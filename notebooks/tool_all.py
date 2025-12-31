@@ -362,20 +362,21 @@ if __name__ == "__main__":
 '''
 
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks/CoffeeSetupMug.hdf5 \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/CoffeeSetupMug.hdf5 \
   --outdir ./ooi_anno/CoffeeSetupMug/ \
   --ignore 0 \
-  --topk 3 
+  --topk 3 \
+  --all
   
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks/PnPCabToCounter.hdf5 \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/PnPCabToCounter.hdf5 \
   --outdir ./ooi_anno/PnPCabToCounter/ \
   --ignore 0 \
   --topk 3 \
   --all
   
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks/TurnOffStove.hdf5 \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/TurnOffStove.hdf5 \
   --outdir ./ooi_anno/TurnOffStove/ \
   --ignore 0 \
   --topk 3 \
@@ -383,14 +384,14 @@ python notebooks/tool_all.py \
   
   
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks/TurnOnMicrowave.hdf5 \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/TurnOnMicrowave.hdf5 \
   --outdir ./ooi_anno/TurnOnMicrowave/ \
   --ignore 0 \
   --topk 3 \
   --all
   
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks/PnPCounterToCab.hdf5 \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/PnPCounterToCab.hdf5 \
   --outdir ./ooi_anno/PnPCounterToCab/ \
   --ignore 0 \
   --topk 3 \

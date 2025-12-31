@@ -23,7 +23,10 @@ def get_env_metadata_from_dataset(dataset_path):
     """
     dataset_path = os.path.expanduser(dataset_path)
     f = h5py.File(dataset_path, "r")
-    env_meta = json.loads(f["data"].attrs["env_args"])
+    try:
+        env_meta = json.loads(f.attrs["env_args"])
+    except:
+        env_meta = json.loads(f["data"].attrs["env_args"])
     f.close()
     return env_meta
 

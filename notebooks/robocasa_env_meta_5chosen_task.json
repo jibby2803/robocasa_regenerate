@@ -1,0 +1,407 @@
+{
+  "PnPCabToCounter": {
+    "env_name": "PnPCabToCounter",
+    "env_version": "1.5.0",
+    "type": 1,
+    "env_kwargs": {
+      "robots": "PandaMobile",
+      "controller_configs": {
+        "type": "OSC_POSE",
+        "input_max": 1,
+        "input_min": -1,
+        "output_max": [
+          0.05,
+          0.05,
+          0.05,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "output_min": [
+          -0.05,
+          -0.05,
+          -0.05,
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "kp": 150,
+        "damping_ratio": 1,
+        "impedance_mode": "fixed",
+        "kp_limits": [
+          0,
+          300
+        ],
+        "damping_ratio_limits": [
+          0,
+          10
+        ],
+        "position_limits": null,
+        "orientation_limits": null,
+        "uncouple_pos_ori": true,
+        "control_delta": true,
+        "interpolation": null,
+        "ramp_ratio": 0.2
+      },
+      "layout_ids": -1,
+      "style_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11
+      ],
+      "translucent_robot": false,
+      "obj_instance_split": "A",
+      "seed": 1000,
+      "has_renderer": false,
+      "has_offscreen_renderer": true,
+      "ignore_done": false,
+      "use_object_obs": true,
+      "use_camera_obs": true,
+      "camera_depths": true,
+      "generative_textures": "100p",
+      "randomize_cameras": true,
+      "reward_shaping": false,
+      "camera_names": [
+        "robot0_agentview_left",
+        "robot0_agentview_right",
+        "robot0_eye_in_hand"
+      ],
+      "camera_heights": 256,
+      "camera_widths": 256,
+      "camera_segmentations": "element",
+      "env_name": "PnPCabToCounter",
+      "renderer": "mjviewer"
+    }
+  },
+  "PnPCounterToCab": {
+    "env_name": "PnPCounterToCab",
+    "env_version": "1.5.0",
+    "type": 1,
+    "env_kwargs": {
+      "robots": "PandaMobile",
+      "controller_configs": {
+        "type": "OSC_POSE",
+        "input_max": 1,
+        "input_min": -1,
+        "output_max": [
+          0.05,
+          0.05,
+          0.05,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "output_min": [
+          -0.05,
+          -0.05,
+          -0.05,
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "kp": 150,
+        "damping_ratio": 1,
+        "impedance_mode": "fixed",
+        "kp_limits": [
+          0,
+          300
+        ],
+        "damping_ratio_limits": [
+          0,
+          10
+        ],
+        "position_limits": null,
+        "orientation_limits": null,
+        "uncouple_pos_ori": true,
+        "control_delta": true,
+        "interpolation": null,
+        "ramp_ratio": 0.2
+      },
+      "layout_ids": -1,
+      "style_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11
+      ],
+      "translucent_robot": false,
+      "obj_instance_split": "A",
+      "seed": 1002,
+      "has_renderer": false,
+      "has_offscreen_renderer": true,
+      "ignore_done": false,
+      "use_object_obs": true,
+      "use_camera_obs": true,
+      "camera_depths": true,
+      "generative_textures": "100p",
+      "randomize_cameras": true,
+      "reward_shaping": false,
+      "camera_names": [
+        "robot0_agentview_left",
+        "robot0_agentview_right",
+        "robot0_eye_in_hand"
+      ],
+      "camera_heights": 256,
+      "camera_widths": 256,
+      "camera_segmentations": "element",
+      "env_name": "PnPCounterToCab",
+      "renderer": "mjviewer"
+    }
+  },
+  "CoffeeSetupMug": {
+    "env_name": "CoffeeSetupMug",
+    "env_version": "1.5.0",
+    "type": 1,
+    "env_kwargs": {
+      "robots": "PandaMobile",
+      "controller_configs": {
+        "type": "OSC_POSE",
+        "input_max": 1,
+        "input_min": -1,
+        "output_max": [
+          0.05,
+          0.05,
+          0.05,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "output_min": [
+          -0.05,
+          -0.05,
+          -0.05,
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "kp": 150,
+        "damping_ratio": 1,
+        "impedance_mode": "fixed",
+        "kp_limits": [
+          0,
+          300
+        ],
+        "damping_ratio_limits": [
+          0,
+          10
+        ],
+        "position_limits": null,
+        "orientation_limits": null,
+        "uncouple_pos_ori": true,
+        "control_delta": true,
+        "interpolation": null,
+        "ramp_ratio": 0.2
+      },
+      "layout_ids": -1,
+      "style_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11
+      ],
+      "translucent_robot": false,
+      "obj_instance_split": "A",
+      "seed": 1003,
+      "has_renderer": false,
+      "has_offscreen_renderer": true,
+      "ignore_done": false,
+      "use_object_obs": true,
+      "use_camera_obs": true,
+      "camera_depths": true,
+      "generative_textures": "100p",
+      "randomize_cameras": true,
+      "reward_shaping": false,
+      "camera_names": [
+        "robot0_agentview_left",
+        "robot0_agentview_right",
+        "robot0_eye_in_hand"
+      ],
+      "camera_heights": 256,
+      "camera_widths": 256,
+      "camera_segmentations": "element",
+      "env_name": "CoffeeSetupMug",
+      "renderer": "mjviewer"
+    }
+  },
+  "TurnOffStove": {
+    "env_name": "TurnOffStove",
+    "env_version": "1.5.0",
+    "type": 1,
+    "env_kwargs": {
+      "robots": "PandaMobile",
+      "controller_configs": {
+        "type": "OSC_POSE",
+        "input_max": 1,
+        "input_min": -1,
+        "output_max": [
+          0.05,
+          0.05,
+          0.05,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "output_min": [
+          -0.05,
+          -0.05,
+          -0.05,
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "kp": 150,
+        "damping_ratio": 1,
+        "impedance_mode": "fixed",
+        "kp_limits": [
+          0,
+          300
+        ],
+        "damping_ratio_limits": [
+          0,
+          10
+        ],
+        "position_limits": null,
+        "orientation_limits": null,
+        "uncouple_pos_ori": true,
+        "control_delta": true,
+        "interpolation": null,
+        "ramp_ratio": 0.2
+      },
+      "layout_ids": -1,
+      "style_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11
+      ],
+      "translucent_robot": false,
+      "obj_instance_split": "A",
+      "seed": 1002,
+      "has_renderer": false,
+      "has_offscreen_renderer": true,
+      "ignore_done": false,
+      "use_object_obs": true,
+      "use_camera_obs": true,
+      "camera_depths": true,
+      "generative_textures": "100p",
+      "randomize_cameras": true,
+      "reward_shaping": false,
+      "camera_names": [
+        "robot0_agentview_left",
+        "robot0_agentview_right",
+        "robot0_eye_in_hand"
+      ],
+      "camera_heights": 256,
+      "camera_widths": 256,
+      "camera_segmentations": "element",
+      "env_name": "TurnOffStove",
+      "renderer": "mjviewer"
+    }
+  },
+  "TurnOnMicrowave": {
+    "env_name": "TurnOnMicrowave",
+    "env_version": "1.5.0",
+    "type": 1,
+    "env_kwargs": {
+      "robots": "PandaMobile",
+      "controller_configs": {
+        "type": "OSC_POSE",
+        "input_max": 1,
+        "input_min": -1,
+        "output_max": [
+          0.05,
+          0.05,
+          0.05,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "output_min": [
+          -0.05,
+          -0.05,
+          -0.05,
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "kp": 150,
+        "damping_ratio": 1,
+        "impedance_mode": "fixed",
+        "kp_limits": [
+          0,
+          300
+        ],
+        "damping_ratio_limits": [
+          0,
+          10
+        ],
+        "position_limits": null,
+        "orientation_limits": null,
+        "uncouple_pos_ori": true,
+        "control_delta": true,
+        "interpolation": null,
+        "ramp_ratio": 0.2
+      },
+      "layout_ids": -1,
+      "style_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11
+      ],
+      "translucent_robot": false,
+      "obj_instance_split": "A",
+      "seed": 1003,
+      "has_renderer": false,
+      "has_offscreen_renderer": true,
+      "ignore_done": false,
+      "use_object_obs": true,
+      "use_camera_obs": true,
+      "camera_depths": true,
+      "generative_textures": "100p",
+      "randomize_cameras": true,
+      "reward_shaping": false,
+      "camera_names": [
+        "robot0_agentview_left",
+        "robot0_agentview_right",
+        "robot0_eye_in_hand"
+      ],
+      "camera_heights": 256,
+      "camera_widths": 256,
+      "camera_segmentations": "element",
+      "env_name": "TurnOnMicrowave",
+      "renderer": "mjviewer"
+    }
+  }
+}

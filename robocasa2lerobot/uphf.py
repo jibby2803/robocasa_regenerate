@@ -2,8 +2,8 @@ from huggingface_hub import HfApi
 from dotenv import load_dotenv
 load_dotenv()
 
-repo_id = "binhng/robocasa_test_v1"
-local_folder = "/home/binhng/.cache/huggingface/lerobot/binhng/robocasa_test_v1"
+repo_id = "binhng/robocasa_5_100demos_chosen_tasks_regenerated_element_ooi_v1"
+local_folder = "/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks"
 
 api = HfApi()
 api.create_repo(repo_id=repo_id, repo_type="dataset", private=False, exist_ok=True)
