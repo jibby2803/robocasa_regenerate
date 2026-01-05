@@ -33,7 +33,48 @@ def list_demos(h5_path: str):
                     demos.append((int(k.split("_", 1)[1]), task))
                 except ValueError:
                     pass
-    return sorted(demos)
+    # return sorted(demos)
+    demos = sorted(demos)
+    # print(len(demos))
+    demos = check_ooi_not_exist(h5_path, demos)
+    return demos
+
+def check_ooi_exist(h5_path, demos):
+    pass
+
+
+
+def get_ooi_ids(dataset_name, demo_id, num_demo=100):
+    ooi_anno_dir = f"/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-{num_demo}demos-5chosen-tasks/ooi_anno/{dataset_name.split('.')[0]}/"
+    ooi_files = [
+        f"{demo_id.replace('_', '')}_left_element_ooi.json",
+        f"{demo_id.replace('_', '')}_right_element_ooi.json",
+        f"{demo_id.replace('_', '')}_hand_element_ooi.json"
+    ]
+
+    all_ooi_ids = []
+    for file in ooi_files:
+        try:
+            with open(ooi_anno_dir+file, 'r', encoding='utf-8') as f:
+                all_ooi_ids += json.load(f)  # parse JSON content from file
+        except:
+            continue
+
+    all_ooi_ids = list(set(all_ooi_ids))
+    # print("all_ooi_ids:", all_ooi_ids)
+    return all_ooi_ids
+
+def check_ooi_not_exist(h5_path, demos):
+    dataset_name = h5_path.split("/")[-1].replace(".hdf5", "")
+    num_demos = 100 if "100" in h5_path else 30
+    # ooi_anno_dir = "/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks-element/ooi_anno/"
+    output = []
+    # print(demos)
+    for demo in demos:
+        ooi_ids = get_ooi_ids(dataset_name, f"demo_{demo[0]}", num_demos)
+        if len(ooi_ids) == 0:
+            output.append(demo)
+    return output
 
 def list_obs_keys(h5_path: str, demo_id: int):
     with h5py.File(h5_path, "r") as f:
@@ -369,7 +410,7 @@ python notebooks/tool_all.py \
   --all
   
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/PnPCabToCounter.hdf5 \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks/PnPCabToCounter.hdf5 \
   --outdir ./ooi_anno/PnPCabToCounter/ \
   --ignore 0 \
   --topk 3 \
