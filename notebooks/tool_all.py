@@ -404,7 +404,7 @@ if __name__ == "__main__":
 
 python notebooks/tool_all.py \
   --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/CoffeeSetupMug.hdf5 \
-  --outdir ./ooi_anno/CoffeeSetupMug/ \
+  --outdir /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/ooi_anno/CoffeeSetupMug/ \
   --ignore 0 \
   --topk 3 \
   --all
