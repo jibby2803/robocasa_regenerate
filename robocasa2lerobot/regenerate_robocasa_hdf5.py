@@ -67,7 +67,7 @@ def creat_env_from_hdf5(f):
     env_meta['env_kwargs']['camera_depths'] = True 
     env_meta['env_kwargs']['camera_heights'] = 256
     env_meta['env_kwargs']['camera_widths'] = 256
-    env_meta['env_kwargs']['camera_segmentations'] = 'instance' # element' #'instance'
+    env_meta['env_kwargs']['camera_segmentations'] = 'element'  # element' #'instance'
     # f.close()
 
     env_kwargs = env_meta["env_kwargs"]
