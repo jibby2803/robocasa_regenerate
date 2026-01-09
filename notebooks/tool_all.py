@@ -45,7 +45,8 @@ def check_ooi_exist(h5_path, demos):
 
 
 def get_ooi_ids(dataset_name, demo_id, num_demo=100):
-    ooi_anno_dir = f"/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-{num_demo}demos-5chosen-tasks/ooi_anno/{dataset_name.split('.')[0]}/"
+    # ooi_anno_dir = f"/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30and100demos-7chosen-tasks-for-Binh/{num_demo}/ooi_anno/{dataset_name.split('.')[0]}/"
+    ooi_anno_dir = f"/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30and100demos-6chosen-tasks-for-aLoc/{num_demo}/ooi_anno/{dataset_name.split('.')[0]}/"
     ooi_files = [
         f"{demo_id.replace('_', '')}_left_element_ooi.json",
         f"{demo_id.replace('_', '')}_right_element_ooi.json",
@@ -403,39 +404,11 @@ if __name__ == "__main__":
 '''
 
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/CoffeeSetupMug.hdf5 \
-  --outdir /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/ooi_anno/CoffeeSetupMug/ \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30and100demos-6chosen-tasks-for-aLoc/30/OpenDrawer.hdf5 \
+  --outdir ./ooi_anno/OpenDrawer/ \
   --ignore 0 \
   --topk 3 \
   --all
-  
-python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks/PnPCabToCounter.hdf5 \
-  --outdir ./ooi_anno/PnPCabToCounter/ \
-  --ignore 0 \
-  --topk 3 \
-  --all
-  
-python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/TurnOffStove.hdf5 \
-  --outdir ./ooi_anno/TurnOffStove/ \
-  --ignore 0 \
-  --topk 3 \
-  --all
-  
-  
-python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/TurnOnMicrowave.hdf5 \
-  --outdir ./ooi_anno/TurnOnMicrowave/ \
-  --ignore 0 \
-  --topk 3 \
-  --all
-  
-python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/PnPCounterToCab.hdf5 \
-  --outdir ./ooi_anno/PnPCounterToCab/ \
-  --ignore 0 \
-  --topk 3 \
-  --all
+
 
 '''
