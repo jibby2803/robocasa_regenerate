@@ -230,7 +230,9 @@ def visualize_to_select_views(
     znear: float = None,
     transformation: np.ndarray = None,
     save_path: str = None,
-    window_name: str = "Colorized Point Clouds"
+    window_name: str = "Colorized Point Clouds",
+    a=None,
+    b=None
 ) -> None:
     """
         Input:
@@ -243,6 +245,9 @@ def visualize_to_select_views(
     for rgb, pcd in zip(rgbs, pcds):
         colors = (rgb.reshape(-1, 3) / 255.0).astype(np.float64) # (n_pts, 3) - norm to [0, 1]
         points = pcd.reshape(-1, 3).astype(np.float64)           # (n_pts, 3)
+
+        colors = np.concatenate([colors, b])
+        points = np.concatenate([points, a])
 
         o3d_pcd = o3d.geometry.PointCloud()
         o3d_pcd.colors = o3d.utility.Vector3dVector(colors)

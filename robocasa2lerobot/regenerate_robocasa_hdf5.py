@@ -26,6 +26,7 @@ from renderers.common_utils import (
     visualize_to_select_views
 )
 from renderers.rvt_renderer import RVTRenderer
+from utils import sample_cameras_icosphere
 
 
 ROBOCASA_DUMMY_ACTION = [0.0] * 6 + [-1.0] + [0.0] * 4 + [-1.0]
@@ -178,9 +179,26 @@ def reset_each_demo(env, demo):
         "ep_meta": ep_meta
     }
     reset_to(env, state)
+
+
+def get_mask_image(mask, ooi):
+    ooi_mask = np.isin(mask.squeeze(-1), ooi)
+    ooi_mask_image = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
+    ooi_mask_image[ooi_mask] = [255, 255, 255]
+    return ooi_mask_image
+
+
+def select_maximized_distance_camera_pair(camera_poses):
+    camera_poss = camera_poses[:, :3, 3] # (B, 3)
+    diff = camera_poss[:, None, :] - camera_poss[None, :, :] # (B, B, 3)
+    distances = torch.norm(diff, dim=-1)
+    distances.fill_diagonal_(0)
+    idx_flat = torch.argmax(distances)
+    i, j = divmod(idx_flat.item(), distances.shape[0])
+    return camera_poses[i], camera_poses[j]
     
 
-def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
+def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path, label_dir):
     demo = f["data"][demo_id]
     reset_each_demo(env, demo)
 
@@ -190,7 +208,12 @@ def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
     demo_id_str = demo_id.replace("_", "")
     save_folder = f"/home/lmaotan/data/robocasa_obs_views/{task_name}/{demo_id_str}"
     os.makedirs(save_folder, exist_ok=True)
-    
+
+    ooi_path = os.path.join(label_dir, f"{demo_id_str}_hand_element_ooi.json")
+    with open(ooi_path, "r") as f:
+        ooi = json.load(f)
+    select_views = False
+
     for _ in range(10):
         obs, reward, done, info = env.step(ROBOCASA_DUMMY_ACTION)
     
@@ -272,6 +295,100 @@ def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
         left_image_pt = torch.from_numpy(left_image).cuda().flip([0]).permute(2, 0, 1).unsqueeze(0)
         right_image_pt = torch.from_numpy(right_image).cuda().flip([0]).permute(2, 0, 1).unsqueeze(0)
         wrist_image_pt = torch.from_numpy(wrist_image).cuda().flip([0]).permute(2, 0, 1).unsqueeze(0)
+        
+        ###############################################
+        ############ AUTO CAMERA SELECTION ############
+        ###############################################
+        if not select_views:
+            fused_pcd_aligned = np.concatenate([
+                left_pcd_aligned,
+                right_pcd_aligned,
+                wrist_pcd_aligned
+            ])
+            center_point = fused_pcd_aligned.mean(0)
+            max_distance = np.linalg.norm(fused_pcd_aligned - center_point, axis=-1).max()
+            
+            # generate 60 quarter-sphere cameras
+            camera_poses = sample_cameras_icosphere(
+                center_point,
+                max_distance,
+                num_cameras=60,
+                z_fraction=0.7 # remove top cameras above 70% of the height (radius)
+            )
+            
+            # generate masks for objects of interest (OOI) and the gripper
+            left_mask_image = get_mask_image(obs["robot0_agentview_left_segmentation_element"].copy(), ooi)
+            right_mask_image = get_mask_image(obs["robot0_agentview_right_segmentation_element"].copy(), ooi)
+            wrist_mask_image = get_mask_image(obs["robot0_eye_in_hand_segmentation_element"].copy(), ooi)
+
+            left_mask_image_pt = torch.from_numpy(left_mask_image).cuda().flip([0]).permute(2, 0, 1).unsqueeze(0)
+            right_mask_image_pt = torch.from_numpy(right_mask_image).cuda().flip([0]).permute(2, 0, 1).unsqueeze(0)
+            wrist_mask_image_pt = torch.from_numpy(wrist_mask_image).cuda().flip([0]).permute(2, 0, 1).unsqueeze(0)
+
+            batch = {
+                "robot0_agentview_left_pcd": left_pcd_aligned_pt,
+                "robot0_agentview_right_pcd": right_pcd_aligned_pt,
+                "robot0_eye_in_hand_pcd": wrist_pcd_aligned_pt,
+
+                "robot0_agentview_left_rgb": left_mask_image_pt,
+                "robot0_agentview_right_rgb": right_mask_image_pt,
+                "robot0_eye_in_hand_rgb": wrist_mask_image_pt
+            }
+            extrinsics = torch.from_numpy(camera_poses.copy()).cuda()
+            extrinsics = (extrinsics,)
+            
+            # render masks onto sampled camera views
+            rendered_images = rvt_renderer.render(
+                batch,
+                CAMERA_NAMES,
+                extrinsics=extrinsics
+            )
+            rendered_rgbs = rendered_images[0, :, 3:6] # (B, 3, H, W)
+            
+            # compute visibility score: count pixels larger than 0 (object + gripper visibility)
+            pixel1_cnt = (rendered_rgbs > 0).sum(dim=[1, 2, 3])
+
+            # sort camera views by visibility score and remove the lowest 30%
+            sorted_indices = torch.argsort(pixel1_cnt, descending=True)[:int(round(60 * 0.7))]
+            camera_poses = extrinsics[0][sorted_indices]
+
+            # classify low, mid, high-angle cameras
+            camera_angle_categories = {
+                "low-angle": (15, 30),
+                "mid-angle": (30, 60),
+                "high-angle": (60, 75)
+            }
+
+            camera_poss = camera_poses[:, :3, 3]
+            center_point_pt = torch.from_numpy(center_point.copy()).cuda()
+            vec = camera_poss - center_point_pt
+            radii = torch.norm(vec, dim=-1)
+            elev_degs = torch.rad2deg(torch.asin(vec[:,2] / radii))
+
+            low_mask  = (elev_degs >= camera_angle_categories["low-angle"][0]) & (elev_degs < camera_angle_categories["low-angle"][1])
+            mid_mask  = (elev_degs >= camera_angle_categories["mid-angle"][0]) & (elev_degs < camera_angle_categories["mid-angle"][1])
+            high_mask = (elev_degs >= camera_angle_categories["high-angle"][0]) & (elev_degs < camera_angle_categories["high-angle"][1])
+
+            low_camera_poses = camera_poses[low_mask]
+            mid_camera_poses = camera_poses[mid_mask]
+            high_camera_poses = camera_poses[high_mask]
+
+            print("low low:", low_camera_poses.shape)
+            print("mid mid:", mid_camera_poses.shape)
+
+            # select maximized-distance low-angle cameras
+            low_camera_poseA, low_camera_poseB = select_maximized_distance_camera_pair(low_camera_poses)
+            # select maximized-distance mid-angle cameras
+            mid_camera_poseA, mid_camera_poseB = select_maximized_distance_camera_pair(mid_camera_poses)
+
+            extrinsics = torch.stack([
+                low_camera_poseA,
+                low_camera_poseB,
+                mid_camera_poseA,
+                mid_camera_poseB
+            ])
+            extrinsics = (extrinsics,)
+            select_views = True
 
         batch = {
             "robot0_agentview_left_pcd": left_pcd_aligned_pt,
@@ -283,26 +400,27 @@ def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
             "robot0_eye_in_hand_rgb": wrist_image_pt
         }
 
-        # left_rand_cam_2_left_org_cam = get_perturbed_transformation(env.sim, "robot0_agentview_left")
-        base_2_world = left_extrinsics @ inverse_tf(left_extrinsics_rel, custom_op=True)
-        
-        selected_views_path = f"/home/lmaotan/workspace/robocasa_regenerate/robocasa2lerobot/selected_views/{task_name}/demo1161.npz"
-        extrinsics = None
-        if os.path.isfile(selected_views_path):
-            extrinsics = []
-            with np.load(selected_views_path) as data:
-                for extr in data["camera_extrinsics"]:
-                    extrinsics.append(
-                        torch.from_numpy(base_2_world.copy() @ extr).cuda()
-                    )
-            extrinsics = torch.stack(extrinsics)
-            extrinsics = (extrinsics,)
-        
         rendered_images = rvt_renderer.render(
             batch,
             CAMERA_NAMES,
             extrinsics=extrinsics
         )
+
+        # # left_rand_cam_2_left_org_cam = get_perturbed_transformation(env.sim, "robot0_agentview_left")
+        # base_2_world = left_extrinsics @ inverse_tf(left_extrinsics_rel, custom_op=True)
+        
+        # selected_views_path = f"/home/lmaotan/workspace/robocasa_regenerate/robocasa2lerobot/selected_views/{task_name}/demo1161.npz"
+        # extrinsics = None
+        # if os.path.isfile(selected_views_path):
+        #     extrinsics = []
+        #     with np.load(selected_views_path) as data:
+        #         for extr in data["camera_extrinsics"]:
+        #             extrinsics.append(
+        #                 torch.from_numpy(base_2_world.copy() @ extr).cuda()
+        #             )
+        #     extrinsics = torch.stack(extrinsics)
+        #     extrinsics = (extrinsics,)
+
 
         _save_folder = os.path.join(save_folder, "robot0_agentview_left")
         os.makedirs(_save_folder, exist_ok=True)
@@ -318,6 +436,7 @@ def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
 
         for j in range(getattr(rvt_renderer.renderer, "num_img", 0)):
             rendered_rgb = rendered_images[0, j, 3:6]
+            print("hhhhhhh:", torch.all((rendered_rgb == 0) | (rendered_rgb == 1)))
             rendered_rgb = rendered_rgb.permute(1, 2, 0)
             rendered_rgb = (rendered_rgb * 255).cpu().numpy().astype(np.uint8)
             
@@ -325,6 +444,24 @@ def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
             os.makedirs(_save_folder, exist_ok=True)
             cv2.imwrite(os.path.join(_save_folder, f"step{i}.png"), cv2.cvtColor(rendered_rgb, cv2.COLOR_RGB2BGR))
 
+        # AUTO VIEW SELECTION
+        center_point = np.concatenate([left_pcd_aligned, right_pcd_aligned, wrist_pcd_aligned]).mean(0)
+        farthest_point = np.concatenate([left_pcd_aligned, right_pcd_aligned, wrist_pcd_aligned]).max()
+
+        print(center_point)
+
+        _ptA = center_point + np.array([2, 0, 0])
+        _ptB = center_point - np.array([2, 0, 0])
+        _ptC = center_point + np.array([0, 0, 2])
+        _ptD = center_point - np.array([0, 0, 2])
+        _pcd = np.array([_ptA, _ptB, _ptC, _ptD])
+        _color = np.array([
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+            [1, 1, 0]
+        ])
+        
         # TODO
         # env.close()
         # world_2_base = left_extrinsics_rel @ inverse_tf(left_extrinsics, custom_op=True)
@@ -338,7 +475,9 @@ def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
         #     zfar=far,
         #     znear=near,
         #     transformation=world_2_base,
-        #     save_path=selected_views_path
+        #     save_path=selected_views_path,
+        #     a=_pcd,
+        #     b=_color
         # )
 
         # append all keys
@@ -405,7 +544,7 @@ def process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path):
         print(f"Demo {demo_id} not done after all actions executed!")
         
 
-def regenerate_hdf5_dataset(input_path, output_path, debug=False):
+def regenerate_hdf5_dataset(input_path, output_path, label_dir, debug=False):
     rvt_renderer_config = RVTRendererConfig()
     rvt_renderer = RVTRenderer(**asdict(rvt_renderer_config))
 
@@ -422,7 +561,7 @@ def regenerate_hdf5_dataset(input_path, output_path, debug=False):
         all_demo_ids = all_demo_ids[:min(2, len(all_demo_ids))][1:]
     for demo_id in tqdm(all_demo_ids):
         print(f"Processing {demo_id} ...")
-        process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path)
+        process_1_demo(env, f, demo_id, grp, rvt_renderer, input_path, label_dir)
     
     f.close()
     if len(out_f["data"].keys()) == 0:
@@ -438,6 +577,7 @@ if __name__ == "__main__":
     origin_dir = '/home/lmaotan/data/binh'
     regenerate_dir = '/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-100demos-5chosen-tasks/'
     # os.makedirs(regenerate_dir, exist_ok=True)
+    label_dir = "/home/lmaotan/data/object_centric_labels"
     
     task_list = [
         # 'PnPCabToCounter',
@@ -452,6 +592,7 @@ if __name__ == "__main__":
         input_path = os.path.join(origin_dir, f'{task}.hdf5')
         # output_path = os.path.join(regenerate_dir, f'{task}.hdf5')
         output_path = "/home/lmaotan/data/binh/temp.hdf5"
+        _label_dir = os.path.join(label_dir, task)
         
         print(f"Regenerating dataset for task {task} ...")
-        regenerate_hdf5_dataset(input_path, output_path, debug=False)
+        regenerate_hdf5_dataset(input_path, output_path, _label_dir, debug=False)
