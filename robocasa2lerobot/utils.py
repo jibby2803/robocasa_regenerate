@@ -31,21 +31,35 @@ def sample_cameras_icosphere(
 
     camera_poses[:, :3, 3] = vertices
 
-    up = np.array([0,1,0])
-    z_axis = lookat[None, :] - camera_poses[:,:3,3]
-    z_axis /= np.linalg.norm(z_axis, axis=-1).reshape(-1,1)
+    z_axis = lookat[None, :] - camera_poses[:, :3, 3]
+    z_axis /= np.linalg.norm(z_axis, axis=-1, keepdims=True)
 
-    x_axis = np.cross(up.reshape(1,3), z_axis)
-    invalid = (x_axis==0).all(axis=-1)
-    x_axis[invalid] = [-1,0,0]
-    x_axis /= np.linalg.norm(x_axis, axis=-1).reshape(-1,1)
+    up = np.array([[0, 1, 0]])
+    x_axis = np.cross(up, z_axis)
+    parallel_mask = (x_axis==0).all(axis=-1)
+    x_axis[parallel_mask] = [1,0,0]
+    x_axis /= np.linalg.norm(x_axis, axis=-1, keepdims=True)
     
     y_axis = np.cross(z_axis, x_axis)
-    y_axis /= np.linalg.norm(y_axis, axis=-1).reshape(-1,1)
+    y_axis /= np.linalg.norm(y_axis, axis=-1, keepdims=True)
     
     camera_poses[:,:3,0] = x_axis
     camera_poses[:,:3,1] = y_axis
     camera_poses[:,:3,2] = z_axis
+
+    Rz = np.array([
+        [0, -1, 0],
+        [1,  0, 0],
+        [0,  0, 1],
+    ])
+
+    camera_poses[:, :3, :3] = camera_poses[:, :3, :3] @ Rz
+    
+
+    # camera_axis_correction = np.array(
+    #     [[1.0, 0.0, 0.0, 0.0], [0.0, -1.0, 0.0, 0.0], [0.0, 0.0, -1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+    # )
+    # camera_poses = camera_poses @ camera_axis_correction
     
     return camera_poses
 
