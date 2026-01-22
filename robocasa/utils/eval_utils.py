@@ -4,7 +4,7 @@ from robocasa.utils.dataset_registry import (
     MULTI_STAGE_TASK_DATASETS,
 )
 from robocasa.scripts.playback_dataset import get_env_metadata_from_dataset
-from robosuite import load_controller_config
+from robosuite import load_part_controller_config as load_controller_config 
 import os
 import robosuite
 import imageio
@@ -46,7 +46,7 @@ def create_eval_env(
         ignore_done=True,
         use_object_obs=True,
         use_camera_obs=True,
-        camera_depths=False,
+        camera_depths=True,
         seed=seed,
         obj_instance_split=obj_instance_split,
         generative_textures=generative_textures,

@@ -47,7 +47,8 @@ class PointRenderer:
         if cameras.is_perspective():
             # We are assuming x and y focal lengths to be about the same.
             focal_length = cameras.intrinsics[0, 0, 0].item()
-            closest_point = point_depths.min()
+            closest_point = point_depths.min().item()
+            closest_point = closest_point if closest_point >= 0 else 1.0 
             try:
                 biggest_splat = math.ceil((splat_radius * focal_length / closest_point))
             except:

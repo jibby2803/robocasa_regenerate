@@ -667,10 +667,10 @@ if __name__ == "__main__":
     label_dir = "/home/lmaotan/data/object_centric_labels"
     
     task_list = [
-        'PnPCabToCounter',
+        # 'PnPCabToCounter',
         # 'PnPCounterToCab',
         # 'CoffeeSetupMug',
-        # 'TurnOffStove',
+        'TurnOffStove',
         # 'TurnOnMicrowave'
         # ... add other tasks as needed
     ]
