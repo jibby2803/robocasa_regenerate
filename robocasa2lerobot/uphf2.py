@@ -2,7 +2,7 @@ from huggingface_hub import HfApi
 from dotenv import load_dotenv
 load_dotenv()
 
-repo_id = "binhng/robocasa-100demos-5tasks-for-dg"
+repo_id = "binhng/robocasa-100demos-5tasks-for-dg_v2"
 local_folder = "/home/binhng/Workspace/data_dreamgen"
 
 api = HfApi()
@@ -18,7 +18,7 @@ api.upload_folder(
     # allow_patterns=["**/*.pt","**/*.json"]  # alternatively, whitelist
 )
 
-# api.upload_large_folder()
+# # api.upload_large_folder()
 # api.upload_large_folder(
 #     folder_path=local_folder,
 #     repo_id=repo_id,

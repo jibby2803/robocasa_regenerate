@@ -147,3 +147,7 @@ robocasa/models/assets/generative_textures
 *draft
 draft*
 data4tracking
+robocasa_ooi_json/
+chosen/
+*.zip
+robocasa_ooi_json_2/

@@ -153,9 +153,9 @@ def process_1_demo(env, f, demo_id, grp):
         # print(f" Step {i} info: {info}")
         # print(f" Step {i} is_success: {env._check_success()}" )
 
-
-    if done:
-        print(f"Demo {demo_id} done after {i} actions!")
+    # unsuccess
+    if not done:
+        print(f"Demo {demo_id} is not done after {i} actions! -> SAVE!!!")
 
         # save to new hdf5 file here
         ep_data = grp.create_group(demo_id)
@@ -180,8 +180,8 @@ def process_1_demo(env, f, demo_id, grp):
         # state dataset
         ep_data.create_dataset("states", data=np.stack(states, axis=0))
 
-    elif not done:
-        print(f"Demo {demo_id} not done after all actions executed!")
+    elif done:
+        print(f"Demo {demo_id} done after all actions executed! -> does not SAVE!")
 
 
 def regenerate_hdf5_dataset(input_path, output_path, debug=False):
@@ -222,9 +222,9 @@ def process_task_wrapper(args):
 
 
 if __name__ == "__main__":
-    n_demo = 30 # 100
+    n_demo = 100 # 100
     origin_dir = f'/home/binhng/Workspace/robocasa/robocasa/datasets/origin_done/robocasa-30demos-5chosen-tasks'
-    regenerate_dir = f'/home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30demos-5chosen-tasks'
+    regenerate_dir = f'/home/binhng/Workspace/robocasa/robocasa/datasets/unsuccess/{n_demo}'
     os.makedirs(regenerate_dir, exist_ok=True)
     
     task_list = [

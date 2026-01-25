@@ -307,6 +307,7 @@ class MPLAnnotator:
         ooi_ids = []
         for box in all_bboxes:
             ooi_ids.append(box['mode'])
+        ooi_ids += [62, 64, 67] # id of gripper in all episodes
         ooi_ids = list(set(ooi_ids))
         with open(out_json_ooi, "w", encoding="utf-8") as f:
             json.dump(ooi_ids, f, indent=2)
@@ -404,7 +405,7 @@ if __name__ == "__main__":
 '''
 
 python notebooks/tool_all.py \
-  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30and100demos-6chosen-tasks-for-aLoc/30/OpenDrawer.hdf5 \
+  --h5 /home/binhng/Workspace/robocasa/robocasa/datasets/regenerate/robocasa-30and100demos-6chosen-tasks-for-aLoc/100/OpenDrawer.hdf5 \
   --outdir ./ooi_anno/OpenDrawer/ \
   --ignore 0 \
   --topk 3 \
